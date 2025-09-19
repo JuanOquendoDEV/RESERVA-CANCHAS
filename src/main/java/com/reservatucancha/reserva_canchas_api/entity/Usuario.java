@@ -4,13 +4,17 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import java.util.Collection;
+import java.util.Collections;
 
-@Data // Genera getters, setters, toString, equals y hashCode
-@NoArgsConstructor // Constructor sin argumentos
-@AllArgsConstructor // Constructor con todos los argumentos
-@Entity // Indica que esta es una entidad JPA
-@Table(name = "usuario") // Mapea la clase a una tabla llamada "usuario"
-public class Usuario {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "usuario")
+public class Usuario implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,16 +26,48 @@ public class Usuario {
     @Column(name = "apellido")
     private String apellido;
 
-    @Column(name = "email", unique = true) // El email debe ser único
+    @Column(name = "email", unique = true)
     private String email;
 
     @Column(name = "password")
     private String password;
 
-    @Column(name = "identificacion", unique = true) // La identificación debe ser única
+    @Column(name = "identificacion", unique = true)
     private String identificacion;
 
     @Column(name = "telefono")
     private String telefono;
 
+    // Métodos de la interfaz UserDetails
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public String getUsername() {
+        // Usamos el email como nombre de usuario para el login
+        return this.email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }
