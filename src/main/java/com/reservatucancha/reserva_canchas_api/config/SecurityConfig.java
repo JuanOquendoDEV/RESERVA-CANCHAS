@@ -19,11 +19,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final UsuarioService usuarioService;
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public SecurityConfig(UsuarioService usuarioService, JwtAuthenticationFilter jwtAuthenticationFilter) {
+    // ¡Aquí está la clave! Ya no inyectamos el filtro en el constructor.
+    // Solo necesitamos el usuarioService para el AuthenticationManager.
+    public SecurityConfig(UsuarioService usuarioService) {
         this.usuarioService = usuarioService;
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter();
     }
 
     @Bean
@@ -40,7 +45,8 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                // ¡Aquí agregamos el filtro usando el método @Bean!
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 

@@ -4,7 +4,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Data
 @NoArgsConstructor
@@ -17,11 +18,14 @@ public class Reserva {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "fecha_hora_inicio")
-    private LocalDateTime fechaHoraInicio;
+    @Column(name = "fecha_reserva")
+    private LocalDate fechaReserva;
 
-    @Column(name = "fecha_hora_fin")
-    private LocalDateTime fechaHoraFin;
+    @Column(name = "hora_inicio")
+    private LocalTime horaInicio;
+
+    @Column(name = "hora_fin")
+    private LocalTime horaFin;
 
     // Relación de muchos a uno: muchas reservas pueden ser hechas por un solo usuario
     @ManyToOne(fetch = FetchType.LAZY)

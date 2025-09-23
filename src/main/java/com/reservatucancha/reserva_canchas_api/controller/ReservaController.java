@@ -51,8 +51,10 @@ public class ReservaController {
         Optional<Reserva> optionalReserva = reservaService.findById(id);
         if (optionalReserva.isPresent()) {
             Reserva existingReserva = optionalReserva.get();
-            existingReserva.setFechaHoraInicio(reservaDto.getFechaHoraInicio());
-            existingReserva.setFechaHoraFin(reservaDto.getFechaHoraFin());
+            // Refactor: Actualizamos los nuevos campos de fecha y hora.
+            existingReserva.setFechaReserva(reservaDto.getFechaReserva());
+            existingReserva.setHoraInicio(reservaDto.getHoraInicio());
+            existingReserva.setHoraFin(reservaDto.getHoraFin());
             existingReserva.setCancha(reservaService.findCanchaById(reservaDto.getCanchaId()).get());
             existingReserva.setUsuario(reservaService.findUsuarioById(reservaDto.getUsuarioId()).get());
 
@@ -73,11 +75,13 @@ public class ReservaController {
         }
     }
 
+    // Refactor: Los métodos de conversión ahora usan los campos de fecha y hora separados
     private ReservaDto convertToDto(Reserva reserva) {
         ReservaDto reservaDto = new ReservaDto();
         reservaDto.setId(reserva.getId());
-        reservaDto.setFechaHoraInicio(reserva.getFechaHoraInicio());
-        reservaDto.setFechaHoraFin(reserva.getFechaHoraFin());
+        reservaDto.setFechaReserva(reserva.getFechaReserva());
+        reservaDto.setHoraInicio(reserva.getHoraInicio());
+        reservaDto.setHoraFin(reserva.getHoraFin());
         reservaDto.setUsuarioId(reserva.getUsuario().getId());
         reservaDto.setCanchaId(reserva.getCancha().getId());
         return reservaDto;
@@ -86,8 +90,9 @@ public class ReservaController {
     private Reserva convertToEntity(ReservaDto reservaDto) {
         Reserva reserva = new Reserva();
         reserva.setId(reservaDto.getId());
-        reserva.setFechaHoraInicio(reservaDto.getFechaHoraInicio());
-        reserva.setFechaHoraFin(reservaDto.getFechaHoraFin());
+        reserva.setFechaReserva(reservaDto.getFechaReserva());
+        reserva.setHoraInicio(reservaDto.getHoraInicio());
+        reserva.setHoraFin(reservaDto.getHoraFin());
         reserva.setUsuario(reservaService.findUsuarioById(reservaDto.getUsuarioId())
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado")));
         reserva.setCancha(reservaService.findCanchaById(reservaDto.getCanchaId())

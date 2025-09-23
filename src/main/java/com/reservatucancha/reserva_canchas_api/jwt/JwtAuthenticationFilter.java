@@ -1,3 +1,4 @@
+// Contenido completo de JwtAuthenticationFilter.java
 package com.reservatucancha.reserva_canchas_api.jwt;
 
 import com.reservatucancha.reserva_canchas_api.service.UsuarioService;
@@ -16,10 +17,18 @@ import java.io.IOException;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    @Autowired
     private JwtTokenProvider tokenProvider;
-    @Autowired
     private UsuarioService usuarioService;
+
+    @Autowired
+    public void setTokenProvider(JwtTokenProvider tokenProvider) {
+        this.tokenProvider = tokenProvider;
+    }
+
+    @Autowired
+    public void setUsuarioService(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
