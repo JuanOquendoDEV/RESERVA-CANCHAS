@@ -2,6 +2,7 @@ package com.reservatucancha.reserva_canchas_api.controller;
 
 import com.reservatucancha.reserva_canchas_api.dto.LoginDto;
 import com.reservatucancha.reserva_canchas_api.dto.RegisterDto;
+import com.reservatucancha.reserva_canchas_api.dto.TokenValidationDto;
 import com.reservatucancha.reserva_canchas_api.entity.Usuario;
 import com.reservatucancha.reserva_canchas_api.jwt.JwtTokenProvider;
 import com.reservatucancha.reserva_canchas_api.repository.UsuarioRepository;
@@ -16,7 +17,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 
+@CrossOrigin(origins = "http://Localhost:3000")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -61,5 +66,43 @@ public class AuthController {
         String token = tokenProvider.generateToken(authentication);
 
         return new ResponseEntity<>(token, HttpStatus.OK);
+    }
+
+    @GetMapping("/verify-token")
+    public ResponseEntity<TokenValidationDto> verifyToken(@RequestHeader("Authorization") String authHeader) {
+        try {
+            // Verificar que el header tiene el formato correcto
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return ResponseEntity.ok(new TokenValidationDto(false, "Token no proporcionado o formato incorrecto"));
+            }
+
+            // Extraer el token del header (remover "Bearer ")
+            String token = authHeader.substring(7);
+
+            // Validar el token
+            if (!tokenProvider.validateToken(token)) {
+                return ResponseEntity.ok(new TokenValidationDto(false, "Token inválido o malformado"));
+            }
+
+            // Verificar si el token ha expirado
+            if (tokenProvider.isTokenExpired(token)) {
+                return ResponseEntity.ok(new TokenValidationDto(false, "Token expirado"));
+            }
+
+            // Si llega aquí, el token es válido
+            String username = tokenProvider.getUsernameFromJwt(token);
+            TokenValidationDto response = new TokenValidationDto(
+                true,
+                username,
+                tokenProvider.getIssuedAtFromToken(token),
+                tokenProvider.getExpirationDateFromToken(token),
+                "Token válido"
+            );
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            return ResponseEntity.ok(new TokenValidationDto(false, "Error al procesar el token: " + e.getMessage()));
+        }
     }
 }

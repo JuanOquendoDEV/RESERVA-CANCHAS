@@ -49,4 +49,31 @@ public class JwtTokenProvider {
         }
         return false;
     }
+    
+    public Claims getClaimsFromToken(String token) {
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+    
+    public Date getExpirationDateFromToken(String token) {
+        Claims claims = getClaimsFromToken(token);
+        return claims != null ? claims.getExpiration() : null;
+    }
+    
+    public Date getIssuedAtFromToken(String token) {
+        Claims claims = getClaimsFromToken(token);
+        return claims != null ? claims.getIssuedAt() : null;
+    }
+    
+    public boolean isTokenExpired(String token) {
+        Date expiration = getExpirationDateFromToken(token);
+        return expiration != null && expiration.before(new Date());
+    }
 }
