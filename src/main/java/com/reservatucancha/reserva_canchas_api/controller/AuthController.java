@@ -1,6 +1,7 @@
 package com.reservatucancha.reserva_canchas_api.controller;
 
 import com.reservatucancha.reserva_canchas_api.dto.LoginDto;
+import com.reservatucancha.reserva_canchas_api.dto.LoginResponseDto;
 import com.reservatucancha.reserva_canchas_api.dto.RegisterDto;
 import com.reservatucancha.reserva_canchas_api.dto.TokenValidationDto;
 import com.reservatucancha.reserva_canchas_api.entity.Usuario;
@@ -58,14 +59,26 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginDto loginDto) {
+    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginDto loginDto) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = tokenProvider.generateToken(authentication);
+        
+        // Buscar el usuario para obtener su información completa
+        Usuario usuario = usuarioRepository.findByEmail(loginDto.getEmail())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        
+        LoginResponseDto response = new LoginResponseDto(
+                token,
+                usuario.getNombre(),
+                usuario.getApellido(),
+                usuario.getEmail(),
+                "Login exitoso"
+        );
 
-        return new ResponseEntity<>(token, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/verify-token")
