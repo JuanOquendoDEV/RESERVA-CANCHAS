@@ -72,6 +72,7 @@ public class AuthController {
         
         LoginResponseDto response = new LoginResponseDto(
                 token,
+                usuario.getId(),
                 usuario.getNombre(),
                 usuario.getApellido(),
                 usuario.getEmail(),
@@ -104,11 +105,18 @@ public class AuthController {
 
             // Si llega aquí, el token es válido
             String username = tokenProvider.getUsernameFromJwt(token);
+            
+            // Buscar el usuario para obtener su ID
+            Usuario usuario = usuarioRepository.findByEmail(username)
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            
             TokenValidationDto response = new TokenValidationDto(
                 true,
+                usuario.getId(),
                 username,
                 tokenProvider.getIssuedAtFromToken(token),
                 tokenProvider.getExpirationDateFromToken(token),
+                token,
                 "Token válido"
             );
 

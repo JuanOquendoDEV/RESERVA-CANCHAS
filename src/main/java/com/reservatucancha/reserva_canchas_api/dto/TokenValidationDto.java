@@ -11,9 +11,11 @@ import java.util.Date;
 @AllArgsConstructor
 public class TokenValidationDto {
     private boolean valid;
+    private Long id;
     private String username;
     private Date issuedAt;
     private Date expiresAt;
+    private String token;
     private String message;
     
     // Constructor para token inválido
