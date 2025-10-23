@@ -13,17 +13,20 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     private final UsuarioService usuarioService;
+    private final CorsConfigurationSource corsConfigurationSource;
 
     // ¡Aquí está la clave! Ya no inyectamos el filtro en el constructor.
     // Solo necesitamos el usuarioService para el AuthenticationManager.
-    public SecurityConfig(UsuarioService usuarioService) {
+    public SecurityConfig(UsuarioService usuarioService, CorsConfigurationSource corsConfigurationSource) {
         this.usuarioService = usuarioService;
+        this.corsConfigurationSource = corsConfigurationSource;
     }
 
     @Bean
@@ -39,6 +42,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()

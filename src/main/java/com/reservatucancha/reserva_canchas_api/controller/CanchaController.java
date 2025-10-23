@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-@CrossOrigin(origins = "http://Localhost:3000")
 @RestController
 @RequestMapping("/api/canchas")
 public class CanchaController {
